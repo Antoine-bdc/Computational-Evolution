@@ -1,8 +1,0 @@
-__pycache__
-.mypy_cache
-.pytest_cache
-.gitignore*
-.vs*
-.vscode
-.vscode/
-src/test*
