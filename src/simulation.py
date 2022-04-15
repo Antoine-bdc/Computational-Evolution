@@ -7,7 +7,7 @@ from typing import Dict
 
 
 class Simulation:
-    def __init__(self) -> None:
+    def __init__(self, parameters) -> None:
         self.size = SIZE
         self.environment: Environment = Environment(self.size, 100, 0.10)
         self.agent_table: Bidict = Bidict((self.size, self.size))

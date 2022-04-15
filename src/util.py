@@ -1,17 +1,23 @@
 from typing import Tuple
+from os import mkdir, path
 
 
 id_counter = 1
 neg_id = -1
 
 
-def fetch_parameters(path):
-    parameters = dict()
-    file = open(path, 'r')
-    for line in file:
-        line.split(" ")
-        parameters[line[0]] = line[1]
-    return parameters
+def write_parameters(folder) -> None:
+    if path.exists(f"data/{folder}"):
+        print("Path already exists. Parameters not written")
+        return None
+    mkdir(f"data/{folder}")
+    data_file = open(f"data/{folder}/parameters.txt", 'w')
+    parameters_file = open("src/parameters.py", 'r')
+    for line in parameters_file:
+        split_line = line.split()
+        data_file.write(f"{split_line[0]} {split_line[2]}\n")
+    data_file.close()
+    parameters_file.close()
 
 
 def get_neighbour_coord(sim, coords, none_value=0):
