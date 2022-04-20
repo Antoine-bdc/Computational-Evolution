@@ -1,5 +1,6 @@
 from typing import Tuple
 from os import mkdir, path
+from random import random
 
 
 id_counter = 1
@@ -54,6 +55,10 @@ def get_agent_from_id(sim, id):
 
 def get_agent_from_coord(sim, coords):
     return get_agent_from_id(sim.agent_table[coords])
+
+
+def mutate_value(value, mutation_probability):
+    return value + value * (random() - 0.5) * mutation_probability
 
 
 class Bidict:

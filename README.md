@@ -14,3 +14,16 @@ The goals can be summirised as follow:
 simulations.
 - Define "fitness" in our framework that agents should maximise.
 - Define the concept of species and try to show its emergence in our system.
+
+### To do:
+
+- [X] Agents eating food
+- [X] Agents reproducing
+- [X] Agents agents dying
+- [X] running the simulation
+- [ ] Writing data to files
+- [ ] 
+
+Data to write:
+- grid (food per tile, total food)
+- agents (coordinates, energy, genes, generation)
