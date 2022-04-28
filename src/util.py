@@ -1,6 +1,9 @@
 from typing import Tuple
 from os import mkdir, path
 from random import random
+import numpy as np
+import matplotlib.pyplot as plt
+from enum import IntEnum, auto
 
 
 id_counter = 1
@@ -37,6 +40,12 @@ def get_neighbour_coord(sim, coords, none_value=0):
     return output
 
 
+class AgentType(IntEnum):
+    PREDATOR = auto()
+    PREY = auto()
+    AGENT = auto()
+
+
 def get_id() -> int:
     global id_counter
     id_counter += 1
@@ -59,6 +68,28 @@ def get_agent_from_coord(sim, coords):
 
 def mutate_value(value, mutation_probability):
     return value + value * (random() - 0.5) * mutation_probability
+
+
+def plot_data(data, name=""):
+    x_axis = np.arange(len(data))
+
+    data_mean = [np.median(item) for item in data]
+    data_min = [np.min(item) for item in data]
+    data_max = [np.max(item) for item in data]
+    error = [np.std(item) for item in data]
+    plt.plot(x_axis, data_max, color='red', label=f"{name} max", alpha=0.3)
+    plt.errorbar(x_axis, data_mean, color='yellow', yerr=error, alpha=0.05)
+    plt.plot(x_axis, data_mean, color='orange', label=f"{name} mean")
+    plt.plot(x_axis, data_min, color='blue', label=f"{name} min", alpha=0.3)
+    plt.title(name)
+    plt.ylim(bottom=0)
+    plt.legend()
+    plt.show()
+
+
+def write_data(iteration, environment, agents):
+    # Data format: iteration, i, j, max_food, food, is_agent, agent_genes
+    pass
 
 
 class Bidict:

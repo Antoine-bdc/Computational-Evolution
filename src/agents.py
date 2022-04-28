@@ -1,4 +1,4 @@
-from util import get_id, mutate_value
+from util import AgentType, get_id, mutate_value
 from parameters import DYING_THRESHOLD
 
 
@@ -11,11 +11,13 @@ class Agent:
         min_energy: float,
         mutation_probability: float,
         generation: bool,
+        type=AgentType.AGENT,
     ):
         self.id: int = get_id()
         self.coords: tuple
         self.generation: int = generation
         self.energy: float = init_energy
+        self.type = type
 
         # Mutable genes
         self._nb_offspring: float = nb_offspring
@@ -47,23 +49,86 @@ class Agent:
         self.energy += food
 
     def mutated_gene(self, gene):
-        return mutate_value(gene, self.mutation_probability)
+        return max(0, mutate_value(gene, self.mutation_probability))
 
     def give_birth(self, neigh_space):
-        if self.birth_threshold < self.energy:
+        if self.energy > self.birth_threshold:
             max_children = min(neigh_space, self.nb_offspring)
             new_agents = []
+
+            if self.type is AgentType.PREDATOR:
+                agent_class = Predator
+            elif self.type is AgentType.PREY:
+                agent_class = Prey
+            else:
+                agent_class = Agent
+
             for i in range(max_children):
-                new_agents.append(Agent(
-                    self.energy_transmited,
-                    self.mutated_gene(self._nb_offspring),
-                    self.mutated_gene(self.energy_transmited),
-                    self.mutated_gene(self.min_energy),
-                    self.mutated_gene(self.mutation_probability),
-                    # min(1, self.mutated_gene(self.mutation_probability)),
-                    self.generation + 1,
-                ))
+                new_agents.append(
+                    agent_class(
+                        self.energy_transmited,
+                        self.mutated_gene(self._nb_offspring),
+                        self.mutated_gene(self.energy_transmited),
+                        self.mutated_gene(self.min_energy),
+                        self.mutated_gene(self.mutation_probability),
+                        self.generation + 1,
+                    )
+                )
                 self.energy -= self.energy_transmited
             return new_agents
         else:
             return []
+
+
+class Prey(Agent):
+    def __init__(
+            self,
+            init_energy: float,
+            nb_offspring: float,
+            energy_transmitted: float,
+            min_energy: float,
+            mutation_probability: float,
+            generation: bool,
+    ):
+        super().__init__(
+            init_energy,
+            nb_offspring,
+            energy_transmitted,
+            min_energy,
+            mutation_probability,
+            generation,
+            AgentType.PREY,
+        )
+
+    def eat(self, environment, agents=None):
+        i, j = self.coords
+        self.energy += environment.food[i, j]
+        environment.food[i, j] = 0
+
+
+class Predator(Agent):
+    def __init__(
+            self,
+            init_energy: float,
+            nb_offspring: float,
+            energy_transmitted: float,
+            min_energy: float,
+            mutation_probability: float,
+            generation: bool,
+    ):
+        super().__init__(
+            init_energy,
+            nb_offspring,
+            energy_transmitted,
+            min_energy,
+            mutation_probability,
+            generation,
+            AgentType.PREDATOR,
+        )
+
+    def eat(self, environment, prey):
+        for p in prey:
+            if self.energy > p.energy:
+                self.energy += p.energy
+                p.energy = 0
+                return p
