@@ -5,7 +5,7 @@
 
 This project has been developped over six months during my Erasmus+ exchange year at Imperial College London. The prompt was Computational evolution and the interpretetion was left to the students. 
 This repository contains two branches:
-- 2018: The state this project was finished in 2018.
+- old: The state this project was finished in 2018.
 - main: The rewriting of this project done with my python skills in 2022. At the moment this is a work in progress.
 
 
