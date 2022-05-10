@@ -10,18 +10,20 @@ id_counter = 1
 neg_id = -1
 
 
-def write_parameters(folder) -> None:
-    if path.exists(f"data/{folder}"):
-        print("Path already exists. Parameters not written")
-        return None
-    mkdir(f"data/{folder}")
-    data_file = open(f"data/{folder}/parameters.txt", 'w')
+def write_parameters() -> None:
+    sim_id = 0
+    while path.exists(f"data/simulation_{sim_id}"):
+        sim_id += 1
+    mkdir(f"data/simulation_{sim_id}")
+    data_file = open(f"data/simulation_{sim_id}/parameters.txt", 'w')
     parameters_file = open("src/parameters.py", 'r')
     for line in parameters_file:
         split_line = line.split()
         data_file.write(f"{split_line[0]} {split_line[2]}\n")
     data_file.close()
     parameters_file.close()
+    print(f"Parameters written in data/simulation_{sim_id}/parameters.txt")
+    return sim_id
 
 
 def get_neighbour_coord(sim, coords, none_value=0):
@@ -41,9 +43,10 @@ def get_neighbour_coord(sim, coords, none_value=0):
 
 
 class AgentType(IntEnum):
-    PREDATOR = auto()
-    PREY = auto()
-    AGENT = auto()
+    NONE = 0
+    PREY = 1
+    PREDATOR = 2
+    AGENT = 3
 
 
 def get_id() -> int:
@@ -85,11 +88,6 @@ def plot_data(data, name=""):
     plt.ylim(bottom=0)
     plt.legend()
     plt.show()
-
-
-def write_data(iteration, environment, agents):
-    # Data format: iteration, i, j, max_food, food, is_agent, agent_genes
-    pass
 
 
 class Bidict:

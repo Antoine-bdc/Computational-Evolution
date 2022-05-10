@@ -7,15 +7,19 @@ from typing import Dict
 
 
 class Simulation:
-    def __init__(self) -> None:
+    def __init__(self, simulation_id) -> None:
         self.size = SIZE
         self.environment = Environment(self.size, 100, REGENERATION)
         self.agent_table: Bidict = Bidict((self.size, self.size))
         self.agents: Dict[int, Agent] = dict()
+        self.simulation_step = 0
+        self.simulation_id = simulation_id
 
     def update(self):
         self.environment.update()
         self.update_agents()
+        self.write_data()
+        self.simulation_step += 1
 
     def add_agent(self, agent: Agent, coords: tuple):
         if self.agent_table.is_empty(coords):
@@ -24,6 +28,34 @@ class Simulation:
             self.agent_table.add_item(coords, agent.id)
         else:
             print("Coordinates occupied, no agent added.")
+
+    def write_data(self):
+        file_name = "step" + str(self.simulation_step)[-8:].zfill(8)
+        data_file = open(
+            f"data/simulation_{self.simulation_id}/{file_name}", "w",
+        )
+        for i in range(self.environment.food.shape[0]):
+            for j in range(self.environment.food.shape[1]):
+                data_file.write(f"{i} ")
+                data_file.write(f"{j} ")
+                data_file.write(f"{self.environment.food[i, j]} ")
+                data_file.write(f"{self.environment.max_food[i, j]} ")
+                if not self.agent_table.is_empty((i, j)):
+                    agent = get_agent_from_id(
+                        self,
+                        self.agent_table.table[i, j],
+                    )
+                    data_file.write(f"{int(agent.type)} ")
+                    data_file.write(f"{agent.energy} ")
+                    data_file.write(f"{agent._nb_offspring} ")
+                    data_file.write(f"{agent.energy_transmited} ")
+                    data_file.write(f"{agent.min_energy} ")
+                    data_file.write(f"{agent.mutation_probability} ")
+                    data_file.write(f"{agent.generation} ")
+                else:
+                    data_file.write("0 0 0 0 0 0 0")
+                data_file.write("\n")
+        data_file.close()
 
     def remove_agent(self, agent):
         self.agents.pop(agent.id)

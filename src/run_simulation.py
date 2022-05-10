@@ -4,7 +4,7 @@ from simulation import Simulation
 from agents import Agent
 from parameters import SIZE, N_ITERATIONS
 from matplotlib.pyplot import plot, show
-from util import mutate_value, plot_data  # , AgentType
+from util import mutate_value, plot_data, write_parameters  # , AgentType
 
 
 def run_simulation(simulation):
@@ -49,7 +49,8 @@ def run_simulation(simulation):
 
 
 if __name__ == "__main__":
-    sim = Simulation()
+    sim_id = write_parameters()
+    sim = Simulation(sim_id)
     for i in range(30):
         mutation_probability = mutate_value(0.2, 0.2)
         n_offspring = mutate_value(1, mutation_probability)
