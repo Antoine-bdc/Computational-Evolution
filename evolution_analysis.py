@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import os as os
 import pickle 
 import numpy.fft as fft
 from matplotlib.font_manager import FontProperties
@@ -9,10 +8,7 @@ import matplotlib.patches as patches
 import matplotlib.path as path
 import matplotlib.animation as animation
 import time as t
-import pylab as pl
 
-os.chdir("D:\\Documents\\Etudes\\Spore\\reproduction\\data ")
-dir=os.getcwd()
 
 mult=1
 data=0
@@ -43,7 +39,8 @@ def weighted_average(smin,smax,parameters=["plot"],variable="a_food"):
         if override!=1:print("Extracting data")
         durationmax=0
         for sim in range(smin,smax):
-            file = open("simulation_"+str(sim)+"/datafile.txt","r")
+            print("data/simulation_"+str(sim)+"/datafile.txt")
+            file = open("data/simulation_"+str(sim)+"/datafile.txt","r")
             for line in file:
                 dat = line.split(" ")
                 if dat[0]=="duration":duration=int(dat[1])
@@ -51,6 +48,7 @@ def weighted_average(smin,smax,parameters=["plot"],variable="a_food"):
                 if dat[0]=="max_food":max_food=float(dat[1])
                 if dat[0]=="n":n=int(dat[1])
                 if dat[0]=="initial_probability":initial_probability=float(dat[1])
+            print(step)
             file.close()    
             if duration>durationmax:simax=sim
             durationmax=max(durationmax,duration)
@@ -96,14 +94,14 @@ def weighted_average(smin,smax,parameters=["plot"],variable="a_food"):
             
             
         for sim in range(smin,smax):
-            file = open("simulation_"+str(sim)+"/datafile.txt","r")
+            file = open("data/simulation_"+str(sim)+"/datafile.txt","r")
             for line in file:
                 dat = line.split(" ")
                 if dat[0]=="duration":duration=int(dat[1])
             file.close()
             for i in range(0,duration//step):
                 if (1*i%100)==0:print("sim",sim,":",round(step*100*i/duration,2))
-                file = open("simulation_"+str(sim)+"/"+str(i*step)+".dat","r")
+                file = open("data/simulation_"+str(sim)+"/"+str(i*step)+".dat","r")
                 a_nb=0
                 p_nb=0
                 grid_food_local=0
@@ -187,9 +185,9 @@ def weighted_average(smin,smax,parameters=["plot"],variable="a_food"):
             p_std_mut_prob += [np.std(p_mut_prob[i])*(p_avg_nb_agents[i])**(-1/2)]
             p_std_generation += [np.std(p_generation[i])*(p_avg_nb_agents[i])**(-1/2)]
         
-        with open('simulations_'+str(smin)+"_"+str(smax)+'.pickle', 'wb') as f:
+        with open('data/simulations_'+str(smin)+"_"+str(smax)+'.pickle', 'wb') as f:
             pickle.dump([T,avg_grid_food,a_avg_nb_agents,a_avg_food,a_avg_min_food,a_avg_nb_offspring,a_avg_food_trans,a_avg_mut_prob,a_avg_generation,p_avg_nb_agents,p_avg_food,p_avg_min_food,p_avg_nb_offspring,p_avg_food_trans,p_avg_mut_prob,p_avg_generation,std_grid_food,a_std_nb_agents,a_std_food,a_std_min_food,a_std_nb_offspring,a_std_food_trans,a_std_mut_prob,a_std_generation,p_std_nb_agents,p_std_food,p_std_min_food,p_std_nb_offspring,p_std_food_trans,p_std_mut_prob,p_std_generation], f, pickle.HIGHEST_PROTOCOL)
-        with open('raw_simulations_'+str(smin)+"_"+str(smax)+'.pickle', 'wb') as f:
+        with open('data/raw_simulations_'+str(smin)+"_"+str(smax)+'.pickle', 'wb') as f:
             pickle.dump([T,nb_sim,grid_food,a_nb_agents,a_food,a_min_food,a_nb_offspring,a_food_trans,a_mut_prob,a_generation,p_nb_agents,p_food,p_min_food,p_nb_offspring,p_food_trans,p_mut_prob,p_generation], f, pickle.HIGHEST_PROTOCOL)
             
     ## Histograms
@@ -215,7 +213,7 @@ def weighted_average(smin,smax,parameters=["plot"],variable="a_food"):
             # exec("data="+variable+".copy()")
             durationmax=0
             for sim in range(smin,smax):
-                file = open("simulation_"+str(sim)+"/datafile.txt","r")
+                file = open("data/simulation_"+str(sim)+"/datafile.txt","r")
                 for line in file:
                     dat = line.split(" ")
                     if dat[0]=="duration":duration=int(dat[1])
@@ -572,10 +570,10 @@ def comparison(s0,s1,s2,s3,label1,label2):
 
 ##execute
 
-smin,smax=100,120
+smin,smax = 6, 10
 
 parameters=["plot","hist"] #"plot" outputs the plots, "hist" the histograms, "override" doesn't load the previously saved data and computes the raw data again, "animate" outputs a histogram animation (doesn't work quite well)
 
 # T,nb_sim,grid_food,a_nb_agents,a_food,a_min_food,a_nb_offspring,a_food_trans,a_mut_prob,a_generation,p_nb_agents,p_food,p_min_food,p_nb_offspring,p_food_trans,p_mut_prob,p_generation=weighted_average(smin,smax,parameters)
 
-comparison(80,100,100,120,label1="steady",label2="seasons")
+weighted_average(smin, smax)

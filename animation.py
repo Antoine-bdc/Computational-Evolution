@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
 import time
 import matplotlib.animation as animation
-import os
 
-os.chdir("D:\\Documents\\Etudes\\Spore\\reproduction\\data ")
-dir=os.getcwd()
 
 fig = plt.figure()
 plt.ion()

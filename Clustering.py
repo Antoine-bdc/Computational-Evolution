@@ -2,7 +2,6 @@ import numpy as np
 from sklearn.cluster import MeanShift, estimate_bandwidth
 from sklearn.datasets.samples_generator import make_blobs
 import matplotlib.pyplot as plt
-import os as os
 import pickle 
 import numpy.fft as fft
 import time 
@@ -18,8 +17,6 @@ from sklearn.preprocessing import StandardScaler
 from itertools import cycle
 from sklearn.cluster import AffinityPropagation
 
-os.chdir("D:\\Documents\\Etudes\\Spore\\reproduction\\data ")
-dir=os.getcwd()
 
 def read(smin,smax,day,parameters=["food","min_food","food_trans"]):
     T,nb_sim,grid_food,a_nb_agents,a_food,a_min_food,a_nb_offspring,a_food_trans,a_mut_prob,a_generation,p_nb_agents,p_food,p_min_food,p_nb_offspring,p_food_trans,p_mut_prob,p_generation = pickle.load(open('raw_simulations_'+str(smin)+"_"+str(smax)+'.pickle', "rb" ))
@@ -208,7 +205,7 @@ def dbscan_clustering(a_data,p_data,eps,min_sample):
     ptot=len(p_data)
     a_db = DBSCAN(eps=eps[0], min_samples=min_sample[0]).fit(a_data)
     a_core_samples_mask = np.zeros_like(a_db.labels_, dtype=bool)
-    a_core_samples_mask[a_db.core_sample_indices_] = True
+    a_core_samples_mask[a_db.core_sample_indexs_] = True
     a_labels = a_db.labels_
     
     # Number of clusters in labels, ignoring noise if present.
@@ -221,7 +218,7 @@ def dbscan_clustering(a_data,p_data,eps,min_sample):
     
     p_db = DBSCAN(eps=eps[1], min_samples=min_sample[1]).fit(p_data)
     p_core_samples_mask = np.zeros_like(p_db.labels_, dtype=bool)
-    p_core_samples_mask[p_db.core_sample_indices_] = True
+    p_core_samples_mask[p_db.core_sample_indexs_] = True
     p_labels = p_db.labels_
     
     # Number of clusters in labels, ignoring noise if present.
@@ -253,15 +250,15 @@ def affinity_propagation_clustering(a_data,p_data,parameters):
     # The following bandwidth can be automatically detected using
 
     a_af = AffinityPropagation(preference=-3e6,damping=0.9999).fit(a_data)
-    a_cluster_centers_indices = a_af.cluster_centers_indices_
+    a_cluster_centers_indexs = a_af.cluster_centers_indexs_
     a_labels = a_af.labels_
-    a_n_clusters_ = len(a_cluster_centers_indices)
+    a_n_clusters_ = len(a_cluster_centers_indexs)
     
     
     p_af = AffinityPropagation(preference=-5e5,damping=0.9999).fit(p_data)
-    p_cluster_centers_indices = p_af.cluster_centers_indices_
+    p_cluster_centers_indexs = p_af.cluster_centers_indexs_
     p_labels = p_af.labels_
-    p_n_clusters_ = len(p_cluster_centers_indices)
+    p_n_clusters_ = len(p_cluster_centers_indexs)
     
 
     print("Agents Silhouette Coefficient: %0.3f"

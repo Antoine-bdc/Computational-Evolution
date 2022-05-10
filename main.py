@@ -1,11 +1,8 @@
 import numpy as np
 import random
 import time
-import os as os
+import os
 
-
-os.chdir("D:\\Documents\\Etudes\\Spore\\reproduction\\data ")
-dir=os.getcwd()
 
 class Agent:
     def __init__(self,type, food, dying_threshold, minimum_food, position,nb_offspring=1,food_transmitted=100,generation=0,mutation_probability=0,multiplicator=1,age=0,totalchildren=0,name=0):
@@ -355,7 +352,7 @@ def count_food(grid):
             food+=grid[i][j][1]
     return food
 
-def print_file_nb_agents(name,nb_agents_tab): #osolete
+def print_file_nb_agents(name,nb_agents_tab): #obsolete
     """writes in a file the argument of the simulation"""
     file = open(name,"w")
     for i in range(len(nb_agents_tab)):
@@ -363,12 +360,15 @@ def print_file_nb_agents(name,nb_agents_tab): #osolete
         file.write("\n")
     file.close()
 
-def write_data_file(grid,day,tab_agents,tab_predators,indice,parameters,finished,negativefood,sumfood,RoT):
+def write_data_file(grid,day,tab_agents,tab_predators,index,parameters,finished,negativefood,sumfood,RoT):
     growth=parameters[11][1]
     if day == 0:
-        os.system("mkdir simulation_"+str(indice))
+        os.mkdir(f"data/simulation_{index}")
+        f = open(f"data/simulation_{index}/datafile.txt", "w")
+        f.close()
+    
 
-    file = open("simulation_"+str(indice)+"/"+str(day)+".dat","w")
+    file = open(f"data/simulation_{index}/{day}.dat","w")
     if sumfood==True:
         file.write("f 0 0 "+str(count_food(grid))+" \n")
     else:
@@ -383,11 +383,10 @@ def write_data_file(grid,day,tab_agents,tab_predators,indice,parameters,finished
         file.write("p "+str(predator.position[0])+" "+str(predator.position[1])+" "+str(predator.food)+" "+str(predator.dying_threshold)+" "+str(predator.minimum_food)+" "+str(predator.nb_offspring)+" "+str(predator.food_transmitted)+" "+str(predator.mutation_probability)+" "+str(predator.multiplicator)+" "+str(predator.last_meal)+" "+str(predator.generation)+" \n")
 
     file.close()
-
     if finished==1 :
         if day!=parameters[1][1]:
             parameters[1][1]=day
-        datafile=open("simulation_"+str(indice)+"\\datafile.txt","w")
+        datafile = open(f"data/simulation_{index}/datafile.txt", "a")
         for i in range (len(parameters)):
             datafile.write(parameters[i][0]+" "+str(parameters[i][1])+"\n")
         datafile.write("negative_food"+" "+str(negativefood)+"\n")
@@ -436,7 +435,6 @@ def run_evolution(n,duration,nbagents,nbpredators,initial_probability,max_food,f
     nombre_agents,nombre_predateurs,food = [],[],[]
     if nbpredators==0:nopredators=True
     else:nopredators=False
-    print(index)
 
     #Looping the evolution
     while (len(agent_list)!=0 and (nopredators or len(predator_list)!=0) and max<len(grid)*len(grid[0]) and day<duration and test==False and negativefood<=1):

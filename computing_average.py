@@ -1,10 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import os as os
 import pickle 
-
-os.chdir("D:\\Documents\\Etudes\\Spore\\reproduction\\data ")
-dir=os.getcwd()
 
 
 def average(smin,smax,daymin):
