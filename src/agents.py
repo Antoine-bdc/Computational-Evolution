@@ -1,5 +1,5 @@
-from util import AgentType, get_id, mutate_value
-from parameters import DYING_THRESHOLD
+from util import get_id, get_neighbouring_agents, mutate_value
+from parameters import DYING_THRESHOLD, AgentType
 
 
 class Agent:
@@ -45,8 +45,10 @@ class Agent:
     def nb_offspring(self):
         return round(self._nb_offspring)
 
-    def eat(self, food):
-        self.energy += food
+    def eat(self, sim):
+        i, j = self.coords
+        self.energy += sim.environment.food[i, j]
+        sim.environment.food[i, j] = 0
 
     def mutated_gene(self, gene):
         return max(0, mutate_value(gene, self.mutation_probability))
@@ -100,10 +102,10 @@ class Prey(Agent):
             AgentType.PREY,
         )
 
-    def eat(self, environment, agents=None):
+    def eat(self, sim):
         i, j = self.coords
-        self.energy += environment.food[i, j]
-        environment.food[i, j] = 0
+        self.energy += sim.environment.food[i, j]
+        sim.environment.food[i, j] = 0
 
 
 class Predator(Agent):
@@ -126,9 +128,19 @@ class Predator(Agent):
             AgentType.PREDATOR,
         )
 
-    def eat(self, environment, prey):
+    def eat(self, sim):
+        prey = get_neighbouring_agents(sim, self.coords)
         for p in prey:
-            if self.energy > p.energy:
-                self.energy += p.energy
-                p.energy = 0
-                return p
+            if p.type == AgentType.PREY:
+                if self.energy > p.energy:
+                    self.energy += p.energy
+                    p.energy = 0
+                    return None
+
+
+AgentClass = {
+    AgentType.PREY: Prey,
+    AgentType.PREDATOR: Predator,
+    AgentType.AGENT: Agent,
+    AgentType.NONE: None,
+}

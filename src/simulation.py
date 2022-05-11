@@ -1,7 +1,7 @@
 from environment import Environment
-from agents import Agent
-from util import get_agent_from_id, get_neighbour_coord, Bidict
-from random import choice, shuffle
+from agents import Agent, AgentClass
+from util import get_agent_from_id, get_empty_neighbour_coord, Bidict
+from random import choice, randint, shuffle
 from parameters import MOVE_COST, IDLE_COST, SIZE, REGENERATION
 from typing import Dict
 
@@ -21,13 +21,14 @@ class Simulation:
         self.write_data()
         self.simulation_step += 1
 
-    def add_agent(self, agent: Agent, coords: tuple):
+    def add_agent(self, agent: Agent, coords: tuple) -> bool:
         if self.agent_table.is_empty(coords):
             agent.coords = coords
             self.agents[agent.id] = agent
             self.agent_table.add_item(coords, agent.id)
+            return True
         else:
-            print("Coordinates occupied, no agent added.")
+            return False
 
     def write_data(self):
         file_name = "step" + str(self.simulation_step)[-8:].zfill(8)
@@ -73,23 +74,21 @@ class Simulation:
             self.check_alive(agent)
 
     def move_agent(self, agent):
-        neighbours = get_neighbour_coord(self, agent.coords)
+        neighbours = get_empty_neighbour_coord(self, agent.coords)
         if len(neighbours) > 0:
             old_coords = agent.coords
             new_coords = choice(neighbours)
             agent.coords = new_coords
-            agent.energy -= MOVE_COST
+            agent.energy -= MOVE_COST[agent.type]
             self.agent_table.swap_coords(old_coords, new_coords)
         else:
-            agent.energy -= IDLE_COST
+            agent.energy -= IDLE_COST[agent.type]
 
     def feed_agent(self, agent):
-        i, j = agent.coords
-        agent.eat(self.environment.food[i, j])
-        self.environment.food[i, j] = 0
+        agent.eat(self)
 
     def check_birth(self, agent):
-        neigh_coords = get_neighbour_coord(self, agent.coords)
+        neigh_coords = get_empty_neighbour_coord(self, agent.coords)
         shuffle(neigh_coords)
         new_agents = agent.give_birth(len(neigh_coords))
         for child in new_agents:
@@ -116,3 +115,12 @@ class Simulation:
         print("|", end="")
         print("_" * self.size * 2, end="")
         print("|")
+
+    def init_agents(self, nb_agents, agent_arguments, agent_type):
+        agent_added = 0
+        while agent_added < nb_agents:
+            if self.add_agent(
+                AgentClass[agent_type](*agent_arguments),
+                    (randint(0, self.size - 1), randint(0, self.size - 1)),
+            ):
+                agent_added += 1

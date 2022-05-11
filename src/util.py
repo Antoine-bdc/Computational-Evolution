@@ -3,7 +3,6 @@ from os import mkdir, path
 from random import random
 import numpy as np
 import matplotlib.pyplot as plt
-from enum import IntEnum, auto
 
 
 id_counter = 1
@@ -19,14 +18,15 @@ def write_parameters() -> None:
     parameters_file = open("src/parameters.py", 'r')
     for line in parameters_file:
         split_line = line.split()
-        data_file.write(f"{split_line[0]} {split_line[2]}\n")
+        if len(split_line) == 3:
+            data_file.write(f"{split_line[0]} {split_line[2]}\n")
     data_file.close()
     parameters_file.close()
     print(f"Parameters written in data/simulation_{sim_id}/parameters.txt")
     return sim_id
 
 
-def get_neighbour_coord(sim, coords, none_value=0):
+def get_neighbour_coord(sim, coords):
     i, j = coords
     neighbour_coords = [
         ((i + 1) % sim.size, j),
@@ -34,19 +34,25 @@ def get_neighbour_coord(sim, coords, none_value=0):
         (i, (j + 1) % sim.size),
         (i, (j - 1) % sim.size),
     ]
+    return neighbour_coords
+
+
+def get_empty_neighbour_coord(sim, coords):
     output = []
-    for n in neighbour_coords:
-        i, j = n
+    for coord in get_neighbour_coord(sim, coords):
+        i, j = coord
         if sim.agent_table.is_empty(((i, j))):
-            output.append(n)
+            output.append(coord)
     return output
 
 
-class AgentType(IntEnum):
-    NONE = 0
-    PREY = 1
-    PREDATOR = 2
-    AGENT = 3
+def get_neighbouring_agents(sim, coords):
+    output = []
+    for coord in get_neighbour_coord(sim, coords):
+        i, j = coord
+        if not sim.agent_table.is_empty(((i, j))):
+            output.append(get_agent_from_coord(sim, coord))
+    return output
 
 
 def get_id() -> int:
@@ -66,7 +72,7 @@ def get_agent_from_id(sim, id):
 
 
 def get_agent_from_coord(sim, coords):
-    return get_agent_from_id(sim.agent_table[coords])
+    return get_agent_from_id(sim, sim.agent_table.table[coords])
 
 
 def mutate_value(value, mutation_probability):
@@ -121,4 +127,5 @@ class Bidict:
         self.table[coord_1], self.table[coord_2] = (id_2, id_1)
 
     def is_empty(self, coords) -> bool:
+        # There is a key error here at times, seems to be caused by i or j = 32
         return (self.table[coords] < 0)

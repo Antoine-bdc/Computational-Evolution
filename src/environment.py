@@ -5,7 +5,7 @@ class Environment:
     def __init__(self, N_size, global_max_food, growth_factor) -> None:
         self.size = N_size
         self.max_food = self.initalize_max_food(global_max_food)
-        self.food = np.zeros((N_size, N_size))
+        self.food = self.max_food.copy()
         self.growth_factor = growth_factor
 
     def update(self) -> None:
